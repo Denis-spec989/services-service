@@ -2,6 +2,7 @@ package github.denisspec989.servicesmainservice.service.impl;
 
 import github.denisspec989.servicesmainservice.domain.ServiceEntity;
 import github.denisspec989.servicesmainservice.models.PetrolStationDto;
+import github.denisspec989.servicesmainservice.models.ServiceDTO;
 import github.denisspec989.servicesmainservice.models.ServiceModelDto;
 import github.denisspec989.servicesmainservice.repository.feign.FileServiceRepository;
 import github.denisspec989.servicesmainservice.repository.jpa.ServicesRepository;
@@ -32,6 +33,16 @@ public class ServicesServiceImpl implements ServicesService {
         }
         return priceList;
     }
+    List<ServiceDTO> fromServiceEntityListToServiceDTOList(List<ServiceEntity> serviceEntityList){
+            List<ServiceDTO> serviceDTOList = new ArrayList<>();
+            for(ServiceEntity service:serviceEntityList){
+                ServiceDTO serviceDTO = new ServiceDTO();
+                serviceDTO.setServId(service.getServiceCompanyId());
+                serviceDTO.setServName(service.getServiceName());
+                serviceDTOList.add(serviceDTO);
+            }
+            return serviceDTOList;
+    }
     @Override
     @Scheduled(cron = "0 0 4 * * *")
     @Transactional
@@ -48,5 +59,11 @@ public class ServicesServiceImpl implements ServicesService {
         }
         System.out.println(savingList.size());
         servicesRepository.saveAll(savingList);
+    }
+
+    @Override
+    @Transactional
+    public List<ServiceDTO> getServicesOnAzs(String azsId) {
+        return fromServiceEntityListToServiceDTOList(servicesRepository.findAllByAzsId(azsId));
     }
 }
