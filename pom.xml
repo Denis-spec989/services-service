@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>github.denisspec989</groupId>
-	<artifactId>services-main-service</artifactId>
+	<artifactId>services-main-serviceEntity</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>services-main-service</name>
+	<name>services-main-serviceEntity</name>
 	<description>Demo project for Spring Boot</description>
 	<properties>
 		<java.version>11</java.version>
