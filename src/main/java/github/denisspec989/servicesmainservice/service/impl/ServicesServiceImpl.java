@@ -8,6 +8,7 @@ import github.denisspec989.servicesmainservice.repository.feign.FileServiceRepos
 import github.denisspec989.servicesmainservice.repository.jpa.ServicesRepository;
 import github.denisspec989.servicesmainservice.service.ServicesService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,9 +48,14 @@ public class ServicesServiceImpl implements ServicesService {
     @Scheduled(cron = "0 0 4 * * *")
     @Transactional
     public void scheduledGetNewServices() {
-        List<ServiceEntity> savingList =fromPetrolStationDtoListToServiceList(fileServiceRepository.getJsonData("Azs_with_prices_and_services"));
-        System.out.println(savingList.size());
-        List<ServiceEntity> xmlList = fromPetrolStationDtoListToServiceList(fileServiceRepository.getXmlData("Azs_with_prices_and_services"));
+        ResponseEntity<List<PetrolStationDto>> responseJson;
+        ResponseEntity<List<PetrolStationDto>> responseXML;
+        do {
+            responseJson = fileServiceRepository.getJsonData("Azs_with_prices_and_services");
+            responseXML=fileServiceRepository.getXmlData("Azs_with_prices_and_services");
+        } while (!(responseJson.getStatusCode().value()==200&&responseXML.getStatusCode().value()==200));
+        List<ServiceEntity> savingList =fromPetrolStationDtoListToServiceList(fileServiceRepository.getJsonData("Azs_with_prices_and_services").getBody());
+        List<ServiceEntity> xmlList = fromPetrolStationDtoListToServiceList(fileServiceRepository.getXmlData("Azs_with_prices_and_services").getBody());
         for(ServiceEntity service:xmlList){
                 if(savingList.contains(service)){
                     continue;
@@ -57,7 +63,6 @@ public class ServicesServiceImpl implements ServicesService {
                     savingList.add(service);
                 }
         }
-        System.out.println(savingList.size());
         servicesRepository.saveAll(savingList);
     }
 
